@@ -13,6 +13,7 @@ function authMiddleware(req, res, next) {
             if (err) {
                 // console.log(err.message)
                 res.locals.userEmail = null;
+                res.locals._id = null;
                 if (!['/login', '/signup', '/'].includes(req.url)) {
                     res.redirect('/login');
                 } else {
@@ -22,12 +23,14 @@ function authMiddleware(req, res, next) {
                 // console.log(decodedToken)
                 let user = await User.findOne({ _id: decodedToken.id });
                 res.locals.userEmail = user.email;
+                res.locals._id = user._id;
                 // console.log(res.locals.userEmail)
                 next();
             }
         });
     } else {
         res.locals.userEmail = null;
+        res.locals._id = null;
         if (!['/login', '/signup', '/'].includes(req.url)) {
             res.redirect('/login');
         } else {

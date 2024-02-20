@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body {
+            margin: 10px 10px 0 10px;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h2 style="text-align: center">HEART RATE: <span id="heart-rate"></span></h2>
+    <h2 style="text-align: center">Kết quả dự đoán: <span id="result-predict"></span></h2>
+    <form method="POST" action="/health" class="form-health ml-3 mt-3" style="width: 25%;">
+
+        <label for="sex">Giới tính:</label>
+        <select name="sex" id="sex">
+            <option value="1">Nam</option>
+            <option value="0">Nữ</option>
+        </select>
+        <br />
+
+        <label for="age">Tuổi: </label>
+        <input type="number" id="age" name="age" min="1" max="150" required>
+        <br />
+
+        <label for="weight">Cân nặng (kg): </label>
+        <input type="number" id="weight" name="weight" required>
+        <br />
+
+        <label for="height">Chiều cao (cm): </label>
+        <input type="number" id="height" name="height" required>
+        <br />
+
+        <label for="chestpaintype">Loại đau ngực:</label>
+        <select name="chestpaintype" id="chestpaintype">
+            <option value="3">Đau thắt ngực điển hình</option>
+            <option value="1">Đau thắt ngực không điển hình</option>
+            <option value="2">Đau ngực không phải do tim</option>
+            <option value="0">Không có triệu chứng</option>
+        </select>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="exercise_angina">
+            <label class="form-check-label" for="exercise_angina">
+                Đau ngực khi tập thể dục
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="prevalent_stroke">
+            <label class="form-check-label" for="prevalent_stroke">
+                Từng bị đột quỵ
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="prevalent_hyp">
+            <label class="form-check-label" for="prevalent_hyp">
+                Từng bị huyết áp cao
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="bp_meds">
+            <label class="form-check-label" for="bp_meds">
+                Đang dùng thuốc huyết áp
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="diabetes">
+            <label class="form-check-label" for="diabetes">
+                Đang bị tiểu đường
+            </label>
+        </div>
+
+        <label for="sysbp">Huyết áp tâm thu (huyết áp khi tim đập):</label>
+        <input type="number" id="sysbp" name="sysbp" required>
+        <br />
+
+        <label for="diabp">Huyết áp tâm trương (huyết áp khi tim nghỉ): </label>
+        <input type="number" id="diabp" name="diabp" required>
+        <br />
+
+        <label for="cholesterol">Cholesterol (mm/dl): </label>
+        <input type="number" id="cholesterol" name="cholesterol" required>
+        <br />
+
+        <label for="glucose">Lượng đường trong máu (mg/dl): </label>
+        <input type="number" id="glucose" name="glucose" required>
+        <br />
+
+        <label for="cigsperday">Số điếu thuốc hút mỗi ngày: </label>
+        <input type="number" id="cigsperday" name="cigsperday" required>
+        <br />
+
+        <button>Submit</button>
+    </form>
+
+    <script>
+        var previousHealthJSON = '<%- data %>';
+        const formHealth = document.querySelector('.form-health')
+        const sexElement = document.querySelector('#sex')
+        const ageElement = document.querySelector('#age')
+        const chestpaintypeElement = document.querySelector('#chestpaintype')
+        const exercise_anginaElement = document.querySelector('#exercise_angina')
+        const prevalent_strokeElement = document.querySelector('#prevalent_stroke')
+        const prevalent_hypElement = document.querySelector('#prevalent_hyp')
+        const bp_medsElement = document.querySelector('#bp_meds')
+        const diabetesElement = document.querySelector('#diabetes')
+        const sysbpElement = document.querySelector('#sysbp')
+        const diabpElement = document.querySelector('#diabp')
+        const cholesterolElement = document.querySelector('#cholesterol')
+        const glucoseElement = document.querySelector('#glucose')
+        const cigsperdayElement = document.querySelector('#cigsperday')
+        const weightElement = document.querySelector('#weight')
+        const heightElement = document.querySelector('#height')
+
+        var previousHealth = JSON.parse(previousHealthJSON)
+        if (previousHealth !== null) {
+            sexElement.value = previousHealth.sex
+            chestpaintypeElement.value = previousHealth.chestpaintype
+            ageElement.value = previousHealth.age
+            weightElement.value = previousHealth.weight
+            heightElement.value = previousHealth.height * 100
+            sysbpElement.value = previousHealth.sysbp
+            diabpElement.value = previousHealth.diabp
+            cholesterolElement.value = previousHealth.cholesterol
+            glucoseElement.value = previousHealth.glucose
+            cigsperdayElement.value = previousHealth.cigsperday
+            exercise_anginaElement.checked = previousHealth.exercise_angina
+            prevalent_strokeElement.checked = previousHealth.prevalent_stroke
+            prevalent_hypElement.checked = previousHealth.prevalent_hyp
+            bp_medsElement.checked = previousHealth.bp_meds
+            diabetesElement.checked = previousHealth.diabetes
+        }
+
+        let exercise_angina = exercise_anginaElement.checked ? 1 : 0
+        console.log(exercise_angina)
+
+
+        formHealth.addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            let sex = sexElement.value
+            let chestpaintype = chestpaintypeElement.value
+
+            let age = ageElement.value
+            let weight = weightElement.value
+            let height = heightElement.value / 100
+
+            let sysbp = sysbpElement.value
+            let diabp = diabpElement.value
+            let cholesterol = cholesterolElement.value
+            let glucose = glucoseElement.value
+            let cigsperday = cigsperdayElement.value
+
+
+            let exercise_angina = exercise_anginaElement.checked ? 1 : 0
+            let prevalent_stroke = prevalent_strokeElement.checked ? 1 : 0
+            let prevalent_hyp = prevalent_hypElement.checked ? 1 : 0
+            let bp_meds = bp_medsElement.checked ? 1 : 0
+            let diabetes = diabetesElement.checked ? 1 : 0
+
+            let statusCode
+
+            sex = Number.parseInt(sex)
+            age = Number.parseInt(age)
+            weight = Number.parseInt(weight)
+            height = Number.parseFloat(height)
+            chestpaintype = Number.parseInt(chestpaintype)
+            cholesterol = Number.parseInt(cholesterol)
+            cigsperday = Number.parseInt(cigsperday)
+            diabp = Number.parseInt(diabp)
+            glucose = Number.parseInt(glucose)
+            sysbp = Number.parseInt(sysbp)
+
+
+
+            fetch('/health', {
+                method: 'POST',
+                body: JSON.stringify({
+                    sex,
+                    chestpaintype,
+                    age,
+                    height,
+                    weight,
+                    sysbp,
+                    diabp,
+                    cholesterol,
+                    glucose,
+                    cigsperday,
+                    exercise_angina,
+                    prevalent_stroke,
+                    prevalent_hyp,
+                    bp_meds,
+                    diabetes
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(res => {
+                    statusCode = res.status
+                    return res.json()
+                })
+                .then(data => {
+                    console.log(data, statusCode)
+                    if (statusCode == 400) {
+                        emailErr.textContent = data.email
+                        passwordErr.textContent = data.password
+                    }
+
+                    if (data.id) {
+                        location.assign('/')  //LOG IN
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error)
+                })
+        })
+
+    </script>
+    <script>
+        const client = new WebSocket('ws://localhost:1111/');
+        const heartRate = document.getElementById('heart-rate')
+        const resultPredict = document.getElementById('result-predict')
+
+        client.onmessage = (event) => {
+            let result = JSON.parse(event.data)  // array
+            heartRate.innerText = result[2]
+
+            if (result[1] < 0.5) {
+                resultPredict.innerText = "Tim mạch của bạn khỏe mạnh!"
+            } else if (result[1] < 0.65) {
+                resultPredict.innerText = "Tim mạch của bạn hơi không khỏe mạnh!"
+            } else {
+                resultPredict.innerText = "Tim mạch của bạn đang yếu đấy!"
+            }
+            
+            
+        };
+
+    </script>
+
+    <!-- Boostrap -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"></script> -->
+
+</body>
+
+</html>

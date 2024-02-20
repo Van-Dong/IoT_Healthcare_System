@@ -18,6 +18,10 @@ const user = new Schema(
             required: [true, 'Please enter an password'],
             minLength: [6, 'Minimum password length is 6 characters'],
         },
+        topic: {
+            type: String,
+            minLength: [6, 'Minimum topic length is 6 characters']
+        }
     },
     {
         timestamps: true,
