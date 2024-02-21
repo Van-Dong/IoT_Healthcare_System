@@ -25,6 +25,7 @@ function handleErrors(err) {
     }
 
     // Handle validate error
+    // console.log("err: ", err)
     Object.values(err.errors).forEach(({ properties }) => {
         errors[properties.path] = properties.message;
     });

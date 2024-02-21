@@ -24,8 +24,13 @@ function authMiddleware(req, res, next) {
                 let user = await User.findOne({ _id: decodedToken.id });
                 res.locals.userEmail = user.email;
                 res.locals._id = user._id;
+                res.locals.topic = user.topic;
                 // console.log(res.locals.userEmail)
-                next();
+                if (!['/login', '/signup', '/'].includes(req.url)) {
+                    next()
+                } else {
+                    res.redirect('/health');;
+                }
             }
         });
     } else {

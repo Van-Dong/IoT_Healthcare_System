@@ -33,10 +33,11 @@ class AuthController {
     // POST /signup
     signup_post(req, res, next) {
         const user = new User(req.body);
+        const maxAge = 3 * 24 * 60 * 60;
         user.save()
             .then(() => {
                 // createToken
-                const token = createToken(user._id);
+                const token = createToken(user._id, maxAge);
                 res.cookie('jwt', token, {
                     maxAge: maxAge * 1000,
                     httpOnly: true,
